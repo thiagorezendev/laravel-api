@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\InvoiceResource;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Validator;
 
 class InvoiceController extends Controller
 {
@@ -22,7 +23,7 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        //
+        //NÃO USAR POIS NÃO TEREMOS VIEW (É UMA API)
     }
 
     /**
@@ -30,7 +31,17 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(),[
+            'user_id' => 'required',
+            'type' => 'required|max:1',
+            'paid' => 'required|numeric|between:0,1',
+            'payment_date' => 'nullable',
+            'value' => 'required|numeric|between:1,9999.99'
+        ]); 
+
+        if($validator->fails()){
+            return response()->json($validator->errors(), 422);
+        }
     }
 
     /**
@@ -46,7 +57,7 @@ class InvoiceController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        //NÃO USAR POIS NÃO TEREMOS VIEW (É UMA API)
     }
 
     /**
