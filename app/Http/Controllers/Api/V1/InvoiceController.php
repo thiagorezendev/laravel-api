@@ -77,13 +77,13 @@ class InvoiceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required',
-            'type' => 'required|max:1',
+            'type' => 'required|max:1|in:' . implode(',', ['B', 'P', 'C']),
             'paid' => 'required|numeric|between:0,1',
             'value' => 'required|numeric',
             'payment_date' => 'nullable|date_format:Y-m-d H:i:s',
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             return $this->error('Invalid update', 422, $validator->errors());
         }
 
@@ -97,7 +97,7 @@ class InvoiceController extends Controller
             'payment_date' => $valited['paid'] ? $valited['payment_date'] : NULL
         ]);
 
-        if($updated) {
+        if ($updated) {
             return $this->response('Invoice updated', 200, new InvoiceResource($invoice->load('user')));
         }
 
@@ -107,8 +107,14 @@ class InvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Invoice $invoice)
     {
-        //
+        $deleted = $invoice->delete();
+
+        if ($deleted) {
+            return $this->response('Invoice deleted.', 200);
+        }
+
+        return $this->error('Invoice not deleted.', 400);
     }
 }
